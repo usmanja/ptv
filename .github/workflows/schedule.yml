@@ -21,6 +21,7 @@ jobs:
     - name: Install Firefox and Xvfb
       run: |
         sudo apt update
+        sudo apt install git
         sudo apt install -y firefox
         sudo apt install -y xvfb  # Install virtual display
 
