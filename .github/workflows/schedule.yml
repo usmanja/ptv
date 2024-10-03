@@ -1,10 +1,10 @@
-name: Run 5 Min
+name: Run 3 Min
 
 on:
   workflow_dispatch:
 
 jobs:
-  Run5Min:
+  Run3Min:
     runs-on: ubuntu-latest
     environment: Cricket
 
@@ -29,5 +29,5 @@ jobs:
       run: |
         while true; do
           curl https://parser.crik.live/delete_yml.php | php
-          sleep 300  # Sleep for 5 minutes
+          sleep 180  # Sleep for 5 minutes
         done
