@@ -21,6 +21,7 @@ jobs:
     - name: Install Composer
       run: |
         sudo apt install git
+        sudo apt install php
         curl -sS https://getcomposer.org/installer | php
         sudo mv composer.phar /usr/local/bin/composer
         composer --version  # Verify Composer installation
