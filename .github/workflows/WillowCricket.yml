@@ -23,4 +23,3 @@ jobs:
         
       - name: Install inotifywait
         run: sudo apt install inotify-tools -y
-
