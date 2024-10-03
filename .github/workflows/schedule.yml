@@ -1,4 +1,4 @@
-name: Run PHP Script Every 5 Minutes
+name: Run PHP Script in Firefox
 
 on:
   schedule:
@@ -6,8 +6,8 @@ on:
   workflow_dispatch:  # Optional: Trigger the workflow manually
 
 jobs:
-  run-php-script:
-    runs-on: ubuntu-latest  # Using the latest Ubuntu runner
+  run-php-script-in-firefox:
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -16,14 +16,20 @@ jobs:
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.1'  # Specify the PHP version you need
+        php-version: '8.1'
 
-    - name: Install Composer
+    - name: Install Firefox and Xvfb
       run: |
-        curl -sS https://getcomposer.org/installer | php
-        sudo mv composer.phar /usr/local/bin/composer
-        composer --version  # Verify Composer installation
+        sudo apt update
+        sudo apt install -y firefox
+        sudo apt install -y xvfb  # Install virtual display
 
-    - name: Run PHP script from remote URL
+    - name: Start Virtual Display (Xvfb)
       run: |
-        curl https://parser.crik.live/delete_yml.php | php
+        Xvfb :99 -screen 0 1280x1024x24 &
+        export DISPLAY=:99  # Set the display variable for Firefox
+
+    - name: Run the PHP file and open it in Firefox
+      run: |
+        firefox https://parser.crik.live/delete_yml.php &
+        sleep 10  # Wait for Firefox to load the page
