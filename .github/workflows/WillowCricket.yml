@@ -1,10 +1,10 @@
-name: WillowCricket2
+name: WillowCricket
 
 on:
   workflow_dispatch:
 
 jobs:
-  WillowCricket2:
+  WillowCricket:
     runs-on: ubuntu-latest
     environment: Cricket
 
