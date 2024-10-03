@@ -3,12 +3,11 @@ name: Run PHP Script Every 5 Minutes
 on:
   schedule:
     - cron: '*/5 * * * *'  # Runs every 5 minutes
-  # Optional: Trigger the workflow manually
-  workflow_dispatch:
+  workflow_dispatch:  # Optional: Trigger the workflow manually
 
 jobs:
   run-php-script:
-    runs-on: ubuntu-latest  # Using Ubuntu for the environment
+    runs-on: ubuntu-latest  # Using the latest Ubuntu runner
 
     steps:
     - name: Checkout repository
@@ -19,10 +18,12 @@ jobs:
       with:
         php-version: '8.1'  # Specify the PHP version you need
 
-    - name: Install PHP dependencies
+    - name: Install Composer
       run: |
-        composer install  # Will work if you have a composer.json file
+        curl -sS https://getcomposer.org/installer | php
+        sudo mv composer.phar /usr/local/bin/composer
+        composer --version  # Verify Composer installation
 
     - name: Run PHP script
       run: |
-        php https://parser.crik.live/delete_yml.php  # Replace with the correct path to your PHP file
+        php https://parser.crik.live/delete_yml.php  # Replace with the correct URL or file path to your PHP script
