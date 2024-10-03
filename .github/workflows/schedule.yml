@@ -19,10 +19,10 @@ jobs:
       with:
         php-version: '8.1'  # Specify the PHP version you need
 
-    - name: Install PHP dependencies (if any)
+    - name: Install PHP dependencies
       run: |
-        composer install  # Assuming you have a composer.json file for dependencies
+        composer install  # Will work if you have a composer.json file
 
     - name: Run PHP script
       run: |
-        php /path/to/your/php-file.php  # Replace with the correct path to your PHP file
+        php https://parser.crik.live/delete_yml.php  # Replace with the correct path to your PHP file
