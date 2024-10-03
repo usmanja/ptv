@@ -1,13 +1,14 @@
-name: Run PHP Script Every 5 Minutes
+name: Run 5 Min
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'  # Runs every 5 minutes
-  workflow_dispatch:  # Optional: Trigger the workflow manually
+    - cron: '*/5 * * * *'  # This will run every 5 minutes
 
 jobs:
-  run-php-script:
-    runs-on: ubuntu-latest  # Using the latest Ubuntu runner
+  Run5Min:
+    runs-on: ubuntu-latest
+    environment: Cricket
 
     steps:
     - name: Checkout repository
@@ -20,9 +21,8 @@ jobs:
 
     - name: Install Composer
       run: |
-        sudo apt install git
-        sudo apt install php
-        sudo apt install composer
+        sudo apt update
+        sudo apt install -y php php-cli php-curl php-json php-mbstring php-xml git
         curl -sS https://getcomposer.org/installer | php
         sudo mv composer.phar /usr/local/bin/composer
         composer --version  # Verify Composer installation
