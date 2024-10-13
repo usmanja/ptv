@@ -14,11 +14,7 @@ jobs:
       - name: Create unroot user
         run: |
           sudo useradd -m unroot
-          # Check if the .config directory exists before creating it
-          if [ ! -d "/home/unroot/.config" ]; then
-            sudo mkdir /home/unroot/.config
-          fi
-          sudo chown unroot:unroot /home/unroot/.config
+          sudo chown -R unroot:unroot /home/unroot
 
       # Step 2: Install VLC and dependencies
       - name: Install VLC and dependencies
@@ -26,7 +22,13 @@ jobs:
           sudo apt update
           sudo apt install -y vlc
 
-      # Step 3: Run the VLC command under the unroot user
+      # Step 3: Ensure permissions are correct
+      - name: Fix permissions for VLC config
+        run: |
+          sudo chown -R unroot:unroot /home/unroot/.config
+          sudo chmod -R 755 /home/unroot/.config
+
+      # Step 4: Run the VLC command under the unroot user
       - name: Run VLC as unroot user
         run: |
           sudo -u unroot cvlc "http://xtv.ooo:8080/5514168769/3198259801/219689" \
