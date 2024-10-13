@@ -1,38 +1,42 @@
-name: Run VLC with unroot user
+name: VLC Transcoding
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  vlc_job:
-    runs-on: ubuntu-22.04  # Specify your OS version
+  run_vlc:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      # Step 1: Create the `unroot` user
-      - name: Create unroot user
-        run: |
+    - name: Set up PulseAudio
+      run: |
+        # Install PulseAudio
+        sudo apt-get update
+        sudo apt-get install -y pulseaudio
+
+        # Create unroot user if it doesn't exist
+        if ! id "unroot" &>/dev/null; then
           sudo useradd -m unroot
-          sudo chown -R unroot:unroot /home/unroot
+        fi
 
-      # Step 2: Install VLC and dependencies
-      - name: Install VLC and dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y vlc
+        # Add unroot user to audio group to access PulseAudio
+        sudo usermod -aG audio unroot
 
-      # Step 3: Ensure permissions are correct
-      - name: Fix permissions for VLC config
-        run: |
-          sudo chown -R unroot:unroot /home/unroot/.config
-          sudo chmod -R 755 /home/unroot/.config
+        # Set up PulseAudio for unroot user
+        sudo mkdir -p /home/unroot/.config/pulse
+        sudo cp -r /etc/pulse/* /home/unroot/.config/pulse/
+        sudo chown -R unroot:unroot /home/unroot/.config/pulse
 
-      # Step 4: Run the VLC command under the unroot user
-      - name: Run VLC as unroot user
-        run: |
-          sudo -u unroot cvlc "http://xtv.ooo:8080/5514168769/3198259801/219689" \
-          --sout "#transcode{vcodec=h264,vb=300,scale=1,height=360,fps=20,acodec=mp4a,ab=48,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=360p.m3u8,index-url=/360p-########.ts},mux=ts,dst=360p-########.ts}}" \
-          --sout "#transcode{vcodec=h264,vb=500,scale=1,height=480,fps=20,acodec=mp4a,ab=64,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=480p.m3u8,index-url=/480p-########.ts},mux=ts,dst=480p-########.ts}}" \
-          --sout "#transcode{vcodec=h264,vb=1500,scale=1,height=720,fps=20,acodec=mp4a,ab=96,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=720p.m3u8,index-url=/720p-########.ts},mux=ts,dst=720p-########.ts}}" \
-          --no-dbus --no-video-title-show --no-audio --loop
+    - name: Run VLC Transcoding
+      run: |
+        sudo -u unroot cvlc "http://xtv.ooo:8080/5514168769/3198259801/219689" \
+        --sout "#transcode{vcodec=h264,vb=300,scale=1,height=360,fps=20,acodec=mp4a,ab=48,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=360p.m3u8,index-url=/360p-########.ts},mux=ts,dst=360p-########.ts}}" \
+        --sout "#transcode{vcodec=h264,vb=500,scale=1,height=480,fps=20,acodec=mp4a,ab=64,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=480p.m3u8,index-url=/480p-########.ts},mux=ts,dst=480p-########.ts}}" \
+        --sout "#transcode{vcodec=h264,vb=1500,scale=1,height=720,fps=20,acodec=mp4a,ab=96,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=720p.m3u8,index-url=/720p-########.ts},mux=ts,dst=720p-########.ts}}" \
+        --no-dbus --no-video-title-show --no-audio --loop
