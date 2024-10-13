@@ -1,25 +1,33 @@
-name: WillowCricket
+name: Run VLC with unroot user
 
-on:
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  WillowCricket:
-    runs-on: ubuntu-22.04
-    environment: Cricket
+  vlc_job:
+    runs-on: ubuntu-22.04  # Specify your OS version
 
     steps:
-      - name: Install ffmpeg
-        run: sudo apt update && sudo apt install ffmpeg -y
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Install dos2unix
-        run: sudo apt install dos2unix -y
-        
-      - name: Install Git
-        run: sudo apt install git -y
-                
-      - name: Install libavcodec
-        run: sudo apt install libavcodec-extra -y
-        
-      - name: Install inotifywait
-        run: sudo apt install inotify-tools -y
+      # Step 1: Create the `unroot` user
+      - name: Create unroot user
+        run: |
+          sudo useradd -m unroot
+          sudo mkdir /home/unroot/.config
+          sudo chown unroot:unroot /home/unroot/.config
+
+      # Step 2: Install VLC and dependencies
+      - name: Install VLC and dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y vlc
+
+      # Step 3: Run the VLC command under the unroot user
+      - name: Run VLC as unroot user
+        run: |
+          sudo -u unroot cvlc "http://xtv.ooo:8080/5514168769/3198259801/219689" \
+          --sout "#transcode{vcodec=h264,vb=300,scale=1,height=360,fps=20,acodec=mp4a,ab=48,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=360p.m3u8,index-url=/360p-########.ts},mux=ts,dst=360p-########.ts}}" \
+          --sout "#transcode{vcodec=h264,vb=500,scale=1,height=480,fps=20,acodec=mp4a,ab=64,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=480p.m3u8,index-url=/480p-########.ts},mux=ts,dst=480p-########.ts}}" \
+          --sout "#transcode{vcodec=h264,vb=1500,scale=1,height=720,fps=20,acodec=mp4a,ab=96,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=720p.m3u8,index-url=/720p-########.ts},mux=ts,dst=720p-########.ts}}" \
+          --no-dbus --no-video-title-show --no-audio --loop
