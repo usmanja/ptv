@@ -14,7 +14,10 @@ jobs:
       - name: Create unroot user
         run: |
           sudo useradd -m unroot
-          sudo mkdir /home/unroot/.config
+          # Check if the .config directory exists before creating it
+          if [ ! -d "/home/unroot/.config" ]; then
+            sudo mkdir /home/unroot/.config
+          fi
           sudo chown unroot:unroot /home/unroot/.config
 
       # Step 2: Install VLC and dependencies
