@@ -1,43 +1,32 @@
-name: VLC Transcoding
+name: CI
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  run_vlc:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up PulseAudio
-      run: |
-        # Install PulseAudio
-        sudo apt-get update
-        sudo apt-get install -y pulseaudio
-        sudo apt-get install -y vlc
+      - name: Build Docker image
+        run: |
+          docker build -t cricket-tv-live-gui -f dockerfile .
 
-        # Create unroot user if it doesn't exist
-        if ! id "unroot" &>/dev/null; then
-          sudo useradd -m unroot
-        fi
+      - name: Run Docker container
+        run: |
+          docker run -d --name cricket-tv-live-gui -e DISPLAY=:0 cricket-tv-live-gui
 
-        # Add unroot user to audio group to access PulseAudio
-        sudo usermod -aG audio unroot
-
-        # Set up PulseAudio for unroot user
-        sudo mkdir -p /home/unroot/.config/pulse
-        sudo cp -r /etc/pulse/* /home/unroot/.config/pulse/
-        sudo chown -R unroot:unroot /home/unroot/.config/pulse
-
-    - name: Run VLC Transcoding
-      run: |
-        sudo -u unroot cvlc "http://xtv.ooo:8080/5514168769/3198259801/219689" \
-        --sout "#transcode{vcodec=h264,vb=300,scale=1,height=360,fps=20,acodec=mp4a,ab=48,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=360p.m3u8,index-url=/360p-########.ts},mux=ts,dst=360p-########.ts}}" \
-        --sout "#transcode{vcodec=h264,vb=500,scale=1,height=480,fps=20,acodec=mp4a,ab=64,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=480p.m3u8,index-url=/480p-########.ts},mux=ts,dst=480p-########.ts}}" \
-        --sout "#transcode{vcodec=h264,vb=1500,scale=1,height=720,fps=20,acodec=mp4a,ab=96,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=720p.m3u8,index-url=/720p-########.ts},mux=ts,dst=720p-########.ts}}" \
-        --no-dbus --no-video-title-show --no-audio --loop
+      - name: Install VLC and run command
+        run: |
+          docker exec -it cricket-tv-live-gui bash -c "
+          sudo apt-get update && 
+          sudo apt-get install -y vlc && 
+          useradd -ms /bin/bash unroot &&
+          echo 'unroot:password' | chpasswd &&
+          sudo -u unroot cvlc \"http://xtv.ooo:8080/5514168769/3198259801/219689\" \
+          --sout \"#transcode{vcodec=h264,vb=300,scale=1,height=360,fps=20,acodec=mp4a,ab=48,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=360p.m3u8,index-url=/360p-########.ts},mux=ts,dst=360p-########.ts}}\" \
+          --sout \"#transcode{vcodec=h264,vb=500,scale=1,height=480,fps=20,acodec=mp4a,ab=64,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=480p.m3u8,index-url=/480p-########.ts},mux=ts,dst=480p-########.ts}}\" \
+          --sout \"#transcode{vcodec=h264,vb=1500,scale=1,height=720,fps=20,acodec=mp4a,ab=96,channels=2,samplerate=44100}:duplicate{dst=std{access=livehttp{seglen=30,delsegs=true,numsegs=5,index=720p.m3u8,index-url=/720p-########.ts},mux=ts,dst=720p-########.ts}}\" \
+          --no-dbus --no-video-title-show --no-audio --loop"
