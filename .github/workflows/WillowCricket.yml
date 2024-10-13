@@ -19,6 +19,7 @@ jobs:
         # Install PulseAudio
         sudo apt-get update
         sudo apt-get install -y pulseaudio
+        sudo apt-get install -y vlc
 
         # Create unroot user if it doesn't exist
         if ! id "unroot" &>/dev/null; then
