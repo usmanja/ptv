@@ -16,6 +16,9 @@ jobs:
       - name: Download Flussonic
         run:  sudo git clone "https://github.com/Bighra13/flussonic.git"
 
+      - name: show all
+        run: ls
+
       - name: change the folder
         run: cd flussonic
 
