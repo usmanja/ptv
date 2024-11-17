@@ -1,4 +1,4 @@
-name: Setup SSH Tunnel and Web Server
+name: SSH Tunnel & Web Server Setup
 
 on:
   workflow_dispatch:
@@ -6,28 +6,41 @@ on:
 jobs:
   setup-ssh-tunnel:
     runs-on: ubuntu-latest
-
+    environment: Cricket
     steps:
-      - name: Install SSH client
-        run: sudo apt-get install -y openssh-client
-
-      - name: Add SSH private key to ssh-agent
+      - name: Install necessary dependencies
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $REMOTE_SERVER_IP >> ~/.ssh/known_hosts
+          sudo apt-get update
+          sudo apt-get install -y git openssh-server curl
 
-      - name: Create an SSH tunnel to forward port 80
+      - name: Create SSH directory
+        run: sudo mkdir -p /root/.ssh
+
+      - name: Set up SSH keys
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          nohup ssh -N -L 8080:localhost:80 $REMOTE_SSH_USERNAME@$REMOTE_SERVER_IP &
+          echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
+          sudo chmod 600 /root/.ssh/id_rsa
+          sudo ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-      - name: Start Web Server (Example)
+      - name: Install Flussonic
         run: |
-          # Start a simple web server on port 80
-          sudo apt-get install -y apache2
-          sudo systemctl start apache2
-          sudo systemctl enable apache2
+          sudo mkdir -p /opt/Flussonic
+          sudo git clone "https://github.com/Bighra13/flussonic.git" /opt/Flussonic
+          cd /opt/Flussonic
+          sudo bash Flussonic_23.01_Nulled.sh
 
-      - name: Verify web server
-        run: curl http://localhost:8080
+      - name: Start SSH tunnel for port 80 access
+        run: |
+          nohup ssh -N -L 0.0.0.0:80:localhost:80 -p 22 -i /root/.ssh/id_rsa user@your-remote-server-ip &
+          echo "SSH Tunnel started on port 80"
+
+      - name: Display public IP
+        run: |
+          PUBLIC_IP=$(curl -s ifconfig.me)
+          echo "Public IP of the machine: $PUBLIC_IP"
+
+      - name: Keep the workflow running
+        run: |
+          tail -f /dev/null
