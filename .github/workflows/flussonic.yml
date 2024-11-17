@@ -23,8 +23,11 @@ jobs:
         run: ls
 
       - name: change the folder
-        run: cd flussonic
-
+        run: cd Flussonic
+        
+      - name: show all
+        run: ls
+        
       - name: change the folder
         run: cd flussonic
         
