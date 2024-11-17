@@ -1,0 +1,27 @@
+name: Flussonic
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Flussonic:
+    runs-on: ubuntu-latest
+    environment: Cricket
+
+    steps:
+
+      - name: Install dos2unix
+        run: sudo apt install dos2unix -y
+                
+      - name: Install Git
+        run: sudo apt install git -y
+        
+      - name: Download Flussonic
+        run:  sudo git clone "https://github.com/Bighra13/flussonic.git"
+
+      - name: change the folder
+        run: cd flussonic
+        
+      - name: Install Flussonic
+        run: sudo bash Flussonic_23.01_Nulled.sh
+        
