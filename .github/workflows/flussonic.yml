@@ -21,6 +21,8 @@ jobs:
 
       - name: change the folder
         run: cd flussonic
+      - name: show all
+        run: ls
         
       - name: Install Flussonic
         run: sudo bash Flussonic_23.01_Nulled.sh
