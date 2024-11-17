@@ -9,9 +9,6 @@ jobs:
     environment: Cricket
 
     steps:
-
-      - name: Install dos2unix
-        run: sudo apt install dos2unix -y
                 
       - name: Install Git
         run: sudo apt install git -y
