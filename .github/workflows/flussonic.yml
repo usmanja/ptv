@@ -14,25 +14,25 @@ jobs:
         run: sudo apt install git -y
         
       - name: Create A Folder
-        run: mkdir -p "Flussonic"
+        run: sudo mkdir -p "Flussonic"
         
       - name: Download Flussonic
         run:  sudo git clone "https://github.com/Bighra13/flussonic.git" "Flussonic"
 
       - name: show all
-        run: ls
+        run: sudo ls
 
       - name: change the folder
-        run: cd Flussonic
+        run: sudo cd Flussonic
         
       - name: show all
-        run: ls
+        run: sudo ls
         
       - name: change the folder
-        run: cd flussonic
+        run: sudo cd flussonic
         
       - name: show all
-        run: ls
+        run: sudo ls
         
       - name: Install Flussonic
         run: sudo bash Flussonic_23.01_Nulled.sh
