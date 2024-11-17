@@ -9,7 +9,6 @@ jobs:
     environment: Cricket
 
     steps:
-                
       - name: Install Git
         run: sudo apt install git -y
         
@@ -17,23 +16,11 @@ jobs:
         run: sudo mkdir -p "Flussonic"
         
       - name: Download Flussonic
-        run:  sudo git clone "https://github.com/Bighra13/flussonic.git" "Flussonic"
+        run: sudo git clone "https://github.com/Bighra13/flussonic.git" "Flussonic"
 
-      - name: show all
+      - name: Show all files in the current directory
         run: sudo ls
 
-      - name: change the folder
-        run: sudo cd Flussonic
-        
-      - name: show all
-        run: sudo ls
-        
-      - name: change the folder
-        run: sudo cd flussonic
-        
-      - name: show all
-        run: sudo ls
-        
       - name: Install Flussonic
+        working-directory: Flussonic  # This ensures all subsequent commands are run in the Flussonic directory
         run: sudo bash Flussonic_23.01_Nulled.sh
-        
