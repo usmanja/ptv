@@ -1,0 +1,33 @@
+name: Setup SSH Tunnel and Web Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-ssh-tunnel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install SSH client
+        run: sudo apt-get install -y openssh-client
+
+      - name: Add SSH private key to ssh-agent
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $REMOTE_SERVER_IP >> ~/.ssh/known_hosts
+
+      - name: Create an SSH tunnel to forward port 80
+        run: |
+          nohup ssh -N -L 8080:localhost:80 $REMOTE_SSH_USERNAME@$REMOTE_SERVER_IP &
+
+      - name: Start Web Server (Example)
+        run: |
+          # Start a simple web server on port 80
+          sudo apt-get install -y apache2
+          sudo systemctl start apache2
+          sudo systemctl enable apache2
+
+      - name: Verify web server
+        run: curl http://localhost:8080
