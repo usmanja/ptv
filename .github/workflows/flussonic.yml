@@ -24,3 +24,19 @@ jobs:
       - name: Install Flussonic
         working-directory: Flussonic  # This ensures all subsequent commands are run in the Flussonic directory
         run: sudo bash Flussonic_23.01_Nulled.sh
+
+      - name: Stop Flussonic Service
+        run: |
+          sudo service flussonic stop
+
+      - name: Replace flussonic.conf file
+        run: |
+          sudo curl -o /etc/flussonic/flussonic.conf http://bilalhassan1998.nayatel.net:8080/flussonic.conf
+
+      - name: Restart Flussonic Service
+        run: |
+          sudo service flussonic start
+          
+      - name: Keep Workflow Alive (Optional)
+        run: |
+          echo "Flussonic service is running. Workflow will continue."
