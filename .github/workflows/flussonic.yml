@@ -13,8 +13,11 @@ jobs:
       - name: Install Git
         run: sudo apt install git -y
         
+      - name: Create A Folder
+        run: mkdir -p "Flussonic"
+        
       - name: Download Flussonic
-        run:  sudo git clone "https://github.com/Bighra13/flussonic.git"
+        run:  sudo git clone "https://github.com/Bighra13/flussonic.git" "Flussonic"
 
       - name: show all
         run: ls
