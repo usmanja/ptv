@@ -13,16 +13,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y git openssh-server curl
 
-      - name: Create SSH directory
-        run: sudo mkdir -p /root/.ssh
+      - name: Create SSH directory for runner user
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
-      - name: Set up SSH keys
+      - name: Set up SSH keys for runner user
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
-          sudo chmod 600 /root/.ssh/id_rsa
-          sudo ssh-keyscan github.com >> /root/.ssh/known_hosts
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Install Flussonic
         run: |
@@ -33,7 +35,7 @@ jobs:
 
       - name: Start SSH tunnel for port 80 access
         run: |
-          nohup ssh -N -L 0.0.0.0:80:localhost:80 -p 22 -i /root/.ssh/id_rsa user@your-remote-server-ip &
+          nohup ssh -N -L 0.0.0.0:80:localhost:80 -p 22 -i ~/.ssh/id_rsa user@your-remote-server-ip &
           echo "SSH Tunnel started on port 80"
 
       - name: Display public IP
